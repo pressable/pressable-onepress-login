@@ -166,7 +166,7 @@ final class Pressable_OnePress_Login_Plugin {
 	 * @return string Redirect Url.
 	 */
 	private function filter_redirect_url( $site_id, $user ) {
-		$default_redirect_url = sprintf( 'https://my.pressable.com/sites/%d', $site_id );
+		$default_redirect_url = wp_login_url();
 
 		return apply_filters( 'onepress_login_custom_redirect_url', $default_redirect_url, $site_id, $user );
 	}

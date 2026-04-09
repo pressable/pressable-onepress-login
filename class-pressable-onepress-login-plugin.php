@@ -13,6 +13,9 @@ final class Pressable_OnePress_Login_Plugin {
 			// Handle login request.
 			add_action( 'plugins_loaded', array( $this, 'handle_server_login_request' ) );
 		}
+
+		// Display OnePress error messages on the login page.
+		add_filter( 'login_message', array( $this, 'display_onepress_error' ) );
 	}
 
 	/** Function for handling an incoming login request */
@@ -136,6 +139,22 @@ final class Pressable_OnePress_Login_Plugin {
 		$additional_hosts = apply_filters( 'onepress_login_additional_hosts', $default_additional_hosts );
 
 		return array_merge( $hosts, $additional_hosts );
+	}
+
+	/**
+	 * Display OnePress error message on the WordPress login page.
+	 *
+	 * @param string $message Existing login message HTML.
+	 *
+	 * @return string Login message HTML with error appended if present.
+	 */
+	public function display_onepress_error( $message ) {
+		if ( isset( $_GET['one_click_error'] ) && ! empty( $_GET['one_click_error'] ) ) {
+			$error = esc_html( rawurldecode( $_GET['one_click_error'] ) );
+			$message .= '<div id="login_error"><strong>OnePress Login:</strong> ' . $error . '</div>';
+		}
+
+		return $message;
 	}
 
 	/**

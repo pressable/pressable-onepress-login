@@ -13,6 +13,9 @@ final class Pressable_OnePress_Login_Plugin {
 			// Handle login request.
 			add_action( 'plugins_loaded', array( $this, 'handle_server_login_request' ) );
 		}
+
+		// Display OnePress error messages on the login page.
+		add_filter( 'login_message', array( $this, 'display_onepress_error' ) );
 	}
 
 	/** Function for handling an incoming login request */
@@ -139,6 +142,22 @@ final class Pressable_OnePress_Login_Plugin {
 	}
 
 	/**
+	 * Display OnePress error message on the WordPress login page.
+	 *
+	 * @param string $message Existing login message HTML.
+	 *
+	 * @return string Login message HTML with error appended if present.
+	 */
+	public function display_onepress_error( $message ) {
+		if ( isset( $_GET['one_click_error'] ) && ! empty( $_GET['one_click_error'] ) ) {
+			$error = esc_html( rawurldecode( $_GET['one_click_error'] ) );
+			$message .= '<div id="login_error"><strong>OnePress Login:</strong> ' . $error . '</div>';
+		}
+
+		return $message;
+	}
+
+	/**
 	 * Decide if request should be handled
 	 *
 	 * @return bool True if eligible, False if not.
@@ -166,7 +185,7 @@ final class Pressable_OnePress_Login_Plugin {
 	 * @return string Redirect Url.
 	 */
 	private function filter_redirect_url( $site_id, $user ) {
-		$default_redirect_url = sprintf( 'https://my.pressable.com/sites/%d', $site_id );
+		$default_redirect_url = wp_login_url();
 
 		return apply_filters( 'onepress_login_custom_redirect_url', $default_redirect_url, $site_id, $user );
 	}
